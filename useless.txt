@@ -15,3 +15,15 @@ functioncall :   VAR'('')'  {printf("ICameHERE  functioncall\n");$1->type = 1; }
                | VAR'('args')'  {printf("ICameHERE  functioncall\n");$1->type = 1; }
 
 ;
+
+
+
+printf("ICameHERE  functioncall\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+	    $$->isWhile=0;
+       $$->isFunc=0;
+
+	    char tmp[100];
+       sprintf(tmp,"lw $t0, %s($t8)",$3->addr);
+       sprintf($$->bodyCode,"%s\nsw $t0, %s($t8)\n\n",tmp,$1->addr);
+
+	    $$->down=NULL;

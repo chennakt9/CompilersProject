@@ -2,12 +2,15 @@ a = 2
 b = 4
 
 
-func(a,b){
+
+func()
+
+func(){
     print a
-    return b
+    print b
+
 }
 
-x = func(a,b)
 
 
 

@@ -94,32 +94,22 @@ stmt:
 	    sprintf($$->bodyCode,"%s\nsw $t0,%s($t8)\n", $3, $1->addr);
 	    $$->down=NULL;}
 
-         | VAR '=' VAR'('')'  {printf("ICameHERE  functioncall\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
-	    $$->isWhile=0;
-       $$->isFunc=0;
-
-	    char tmp[100];
-       sprintf(tmp,"lw $t0, %s($t8)",$3->addr);
-       sprintf($$->bodyCode,"%s\nsw $t0, %s($t8)\n\n",tmp,$1->addr);
-
-	    $$->down=NULL; }  /* Function Call w/o params*/
+         
                                                                      // lw $t0,   <--4($t8)
                                                                      // sw $t0,-->  8($t8)
-         | VAR '=' VAR'('args')'  {printf("ICameHERE  functioncall\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         | VAR'('args')'  '\n' {printf("ICameHERE  functioncall\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;
+       $$->isFunc=0;
+	    sprintf($$->bodyCode,"jal FuncName%d\n", funcStart);
+	    $$->down=NULL;}
 
-	    char tmp[100];
-       sprintf(tmp,"lw $t0, %s($t8)",$3->addr);
-       sprintf($$->bodyCode,"%s\nsw $t0, %s($t8)\n\n",tmp,$1->addr);
-
-	    $$->down=NULL; }   /* Function Call w/ params*/
 
 
          
-         | PRINT VAR 			{printf("Printing %d\n", $2); $$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         | PRINT VAR 	'\n'		{printf("Printing %d\n", $2); $$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;
        $$->isFunc=0;
-	    sprintf($$->bodyCode,"li $v0, 1\nlw $a0, %s($t8)\nsyscall\naddi $a0, $0, 0xA\naddi $v0, $0, 0xB\nsyscall", $2->addr);
+	    sprintf($$->bodyCode,"\nli $v0, 1\nlw $a0, %s($t8)\nsyscall\naddi $a0, $0, 0xA\naddi $v0, $0, 0xB\nsyscall\n\n", $2->addr);
 	    $$->down=NULL;}
 
          | error '\n' { yyerrok; }
@@ -135,7 +125,7 @@ args:  arg                        {$$=(struct ArgsNode *) malloc(sizeof(struct A
          | arg ',' args           {printf("ICameHERE  arglist\n");$$=(struct ArgsNode *) malloc(sizeof(struct ArgsNode));
                                     $$->singl=0;$$->left=$1,$$->right=$3; }
     ;
-arg:    VAR                            {$$=(struct ArgNode *) malloc(sizeof(struct ArgNode));
+arg:    {$$=NULL;}| VAR                            {$$=(struct ArgNode *) malloc(sizeof(struct ArgNode));
                        
                         sprintf($$->argcode, "addi $a%d, $zero, %s($t8)",argcount,$1->addr);argcount=(argcount+1)%4;if(argcount==0)argcount=1;
                         $$->down=NULL;}
@@ -181,7 +171,7 @@ void StmtTrav(stmtptr ptr){
       }
       
    }
-   else{
+   else if (ptr->isWhile==1){
       ws=whileStart; whileStart++;nj=nextJump;nextJump++;
       fprintf(fp,"LabStartWhile%d:%s\n%s NextPart%d\n",ws,ptr->initCode,ptr->initJumpCode,nj);
       StmtsTrav(ptr->down);
