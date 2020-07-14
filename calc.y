@@ -6,11 +6,15 @@
 int  yylex(void);
 void yyerror (char  *);
 int whileStart=0,nextJump=0; /*two separate variables not necessary for this application*/
+
+int funcStart=0;
+
 int count=0;
 int argcount=1;
 int labelCount=0;
 FILE *fp;
 struct StmtsNode *final;
+struct StmtsNode *funcfinal;
 struct ArgsNode *argfinal;
 void StmtsTrav(stmtsptr ptr);
 void StmtTrav(stmtptr ptr);
@@ -63,27 +67,58 @@ stmts: stmt {$$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
 stmt:   
         '\n' {$$=NULL;}
 
-        | VAR'(' args ')' '{' stmts '}'          {printf("%s","ICameHERE  just function")}   /* Function declaration w/ params*/
+        | VAR'(' args ')' '{' stmts '}'          {printf("%s","ICameHERE  just function\n");$$=NULL;
+
+         struct StmtNode *temp;
+         temp=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         temp->isWhile=0;
+         temp->isFunc=1;
+         //  sprintf(temp->bodyCode,"%s\nsw $t0,%s($t8)\n", $3, $1->addr);
+         temp->down=$6;
+         funcfinal = (struct StmtsNode *) malloc(sizeof(struct StmtsNode));
+         funcfinal->singl=1;funcfinal->left=temp,funcfinal->right=NULL;
+
+         }   /* Function declaration w/ params*/
 
         | WHILE '(' VAR RELOP VAR ')' '{' stmts '}' '\n' {$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=1;
+       $$->isFunc=0;
 	    sprintf($$->initCode,"lw $t0, %s($t8)\nlw $t1, %s($t8)\n", $3->addr,$5->addr);
 	    sprintf($$->initJumpCode,"bge $t0, $t1,");
 	    $$->down=$8;}
 
          | VAR '=' exp '\n'   {printf("Test1");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;
+       $$->isFunc=0;
+
 	    sprintf($$->bodyCode,"%s\nsw $t0,%s($t8)\n", $3, $1->addr);
 	    $$->down=NULL;}
 
-         | VAR '=' VAR'('')'  {printf("ICameHERE  functioncall\n");$1->type = 1; }  /* Function Call w/o params*/
+         | VAR '=' VAR'('')'  {printf("ICameHERE  functioncall\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+	    $$->isWhile=0;
+       $$->isFunc=0;
 
-         | VAR '=' VAR'('args')'  {printf("ICameHERE  functioncall\n");$1->type = 1; }   /* Function Call w/ params*/
+	    char tmp[100];
+       sprintf(tmp,"lw $t0, %s($t8)",$3->addr);
+       sprintf($$->bodyCode,"%s\nsw $t0, %s($t8)\n\n",tmp,$1->addr);
+
+	    $$->down=NULL; }  /* Function Call w/o params*/
+                                                                     // lw $t0,   <--4($t8)
+                                                                     // sw $t0,-->  8($t8)
+         | VAR '=' VAR'('args')'  {printf("ICameHERE  functioncall\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+	    $$->isWhile=0;
+
+	    char tmp[100];
+       sprintf(tmp,"lw $t0, %s($t8)",$3->addr);
+       sprintf($$->bodyCode,"%s\nsw $t0, %s($t8)\n\n",tmp,$1->addr);
+
+	    $$->down=NULL; }   /* Function Call w/ params*/
 
 
          
          | PRINT VAR 			{printf("Printing %d\n", $2); $$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;
+       $$->isFunc=0;
 	    sprintf($$->bodyCode,"li $v0, 1\nlw $a0, %s($t8)\nsyscall\naddi $a0, $0, 0xA\naddi $v0, $0, 0xB\nsyscall", $2->addr);
 	    $$->down=NULL;}
 
@@ -135,10 +170,23 @@ void StmtTrav(stmtptr ptr){
    int ws,nj;
    printf("stmt\n");
    if(ptr==NULL) return;
-   if(ptr->isWhile==0){fprintf(fp,"%s\n",ptr->bodyCode);}
-   else{ws=whileStart; whileStart++;nj=nextJump;nextJump++;
-     fprintf(fp,"LabStartWhile%d:%s\n%s NextPart%d\n",ws,ptr->initCode,ptr->initJumpCode,nj);StmtsTrav(ptr->down);
-     fprintf(fp,"j LabStartWhile%d\nNextPart%d:\n",ws,nj);}
+   if(ptr->isWhile==0){
+      if (ptr->isFunc==0){fprintf(fp,"%s\n",ptr->bodyCode);}
+      else if (ptr->isFunc==1){
+         int fs=funcStart; funcStart++;
+         fprintf(fp,"FuncName%d:\n",fs);
+         StmtsTrav(ptr->down);
+         fprintf(fp,"jr $ra");
+
+      }
+      
+   }
+   else{
+      ws=whileStart; whileStart++;nj=nextJump;nextJump++;
+      fprintf(fp,"LabStartWhile%d:%s\n%s NextPart%d\n",ws,ptr->initCode,ptr->initJumpCode,nj);
+      StmtsTrav(ptr->down);
+      fprintf(fp,"j LabStartWhile%d\nNextPart%d:\n",ws,nj);
+   }
 	  
 }
    
@@ -150,7 +198,8 @@ int main ()
    fprintf(fp,".data\n\n.text\nmain:\n\n\nli $t8,268500992\n");
    yyparse ();
    StmtsTrav(final);
-   fprintf(fp,"\nli $v0,10\nsyscall\n");
+   fprintf(fp,"\nli $v0,10\nsyscall\n\n\n");
+   StmtsTrav(funcfinal);
    fclose(fp);
    // https://stackoverflow.com/questions/45186052/how-to-write-yacc-grammar-rules-to-identify-function-definitions-vs-function-cal
 }

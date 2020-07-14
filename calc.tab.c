@@ -77,18 +77,22 @@
 int  yylex(void);
 void yyerror (char  *);
 int whileStart=0,nextJump=0; /*two separate variables not necessary for this application*/
+
+int funcStart=0;
+
 int count=0;
 int argcount=1;
 int labelCount=0;
 FILE *fp;
 struct StmtsNode *final;
+struct StmtsNode *funcfinal;
 struct ArgsNode *argfinal;
 void StmtsTrav(stmtsptr ptr);
 void StmtTrav(stmtptr ptr);
 
 
 /* Line 189 of yacc.c  */
-#line 92 "calc.tab.c"
+#line 96 "calc.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -130,7 +134,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 20 "calc.y"
+#line 24 "calc.y"
 
 int   val;  /* For returning numbers.                   */
 struct symrec  *tptr;   /* For returning symbol-table pointers      */
@@ -146,7 +150,7 @@ struct ArgsNode *argsptr;
 
 
 /* Line 214 of yacc.c  */
-#line 150 "calc.tab.c"
+#line 154 "calc.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -158,7 +162,7 @@ struct ArgsNode *argsptr;
 
 
 /* Line 264 of yacc.c  */
-#line 162 "calc.tab.c"
+#line 166 "calc.tab.c"
 
 #ifdef short
 # undef short
@@ -450,9 +454,9 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    56,    56,    57,    59,    64,    66,    68,    74,    79,
-      81,    85,    90,    98,   100,   103,   112,   113,   114,   115,
-     116,   118,   119
+       0,    60,    60,    61,    63,    68,    70,    83,    90,    97,
+     108,   119,   125,   133,   135,   138,   147,   148,   149,   150,
+     151,   153,   154
 };
 #endif
 
@@ -1379,14 +1383,14 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 56 "calc.y"
+#line 60 "calc.y"
     {printf("Hiiiii %d End",((yyvsp[(1) - (1)].stmtsptr)->left));final=(yyvsp[(1) - (1)].stmtsptr);;}
     break;
 
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 57 "calc.y"
+#line 61 "calc.y"
     {(yyval.stmtsptr)=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
    (yyval.stmtsptr)->singl=1;(yyval.stmtsptr)->left=(yyvsp[(1) - (1)].stmtptr),(yyval.stmtsptr)->right=NULL;;}
     break;
@@ -1394,7 +1398,7 @@ yyreduce:
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 59 "calc.y"
+#line 63 "calc.y"
     {(yyval.stmtsptr)=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
    (yyval.stmtsptr)->singl=0;(yyval.stmtsptr)->left=(yyvsp[(1) - (2)].stmtptr),(yyval.stmtsptr)->right=(yyvsp[(2) - (2)].stmtsptr);;}
     break;
@@ -1402,23 +1406,35 @@ yyreduce:
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 64 "calc.y"
+#line 68 "calc.y"
     {(yyval.stmtptr)=NULL;;}
     break;
 
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 66 "calc.y"
-    {printf("%s","ICameHERE  just function");}
+#line 70 "calc.y"
+    {printf("%s","ICameHERE  just function\n");(yyval.stmtptr)=NULL;
+
+         struct StmtNode *temp;
+         temp=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         temp->isWhile=0;
+         temp->isFunc=1;
+         //  sprintf(temp->bodyCode,"%s\nsw $t0,%s($t8)\n", $3, $1->addr);
+         temp->down=(yyvsp[(6) - (7)].stmtsptr);
+         funcfinal = (struct StmtsNode *) malloc(sizeof(struct StmtsNode));
+         funcfinal->singl=1;funcfinal->left=temp,funcfinal->right=NULL;
+
+         ;}
     break;
 
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 68 "calc.y"
+#line 83 "calc.y"
     {(yyval.stmtptr)=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    (yyval.stmtptr)->isWhile=1;
+       (yyval.stmtptr)->isFunc=0;
 	    sprintf((yyval.stmtptr)->initCode,"lw $t0, %s($t8)\nlw $t1, %s($t8)\n", (yyvsp[(3) - (10)].tptr)->addr,(yyvsp[(5) - (10)].tptr)->addr);
 	    sprintf((yyval.stmtptr)->initJumpCode,"bge $t0, $t1,");
 	    (yyval.stmtptr)->down=(yyvsp[(8) - (10)].stmtsptr);;}
@@ -1427,9 +1443,11 @@ yyreduce:
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 74 "calc.y"
+#line 90 "calc.y"
     {printf("Test1");(yyval.stmtptr)=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    (yyval.stmtptr)->isWhile=0;
+       (yyval.stmtptr)->isFunc=0;
+
 	    sprintf((yyval.stmtptr)->bodyCode,"%s\nsw $t0,%s($t8)\n", (yyvsp[(3) - (4)].c), (yyvsp[(1) - (4)].tptr)->addr);
 	    (yyval.stmtptr)->down=NULL;;}
     break;
@@ -1437,23 +1455,39 @@ yyreduce:
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 79 "calc.y"
-    {printf("ICameHERE  functioncall\n");(yyvsp[(1) - (5)].tptr)->type = 1; ;}
+#line 97 "calc.y"
+    {printf("ICameHERE  functioncall\n");(yyval.stmtptr)=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+	    (yyval.stmtptr)->isWhile=0;
+       (yyval.stmtptr)->isFunc=0;
+
+	    char tmp[100];
+       sprintf(tmp,"lw $t0, %s($t8)",(yyvsp[(3) - (5)].tptr)->addr);
+       sprintf((yyval.stmtptr)->bodyCode,"%s\nsw $t0, %s($t8)\n\n",tmp,(yyvsp[(1) - (5)].tptr)->addr);
+
+	    (yyval.stmtptr)->down=NULL; ;}
     break;
 
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 81 "calc.y"
-    {printf("ICameHERE  functioncall\n");(yyvsp[(1) - (6)].tptr)->type = 1; ;}
+#line 108 "calc.y"
+    {printf("ICameHERE  functioncall\n");(yyval.stmtptr)=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+	    (yyval.stmtptr)->isWhile=0;
+
+	    char tmp[100];
+       sprintf(tmp,"lw $t0, %s($t8)",(yyvsp[(3) - (6)].tptr)->addr);
+       sprintf((yyval.stmtptr)->bodyCode,"%s\nsw $t0, %s($t8)\n\n",tmp,(yyvsp[(1) - (6)].tptr)->addr);
+
+	    (yyval.stmtptr)->down=NULL; ;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 85 "calc.y"
+#line 119 "calc.y"
     {printf("Printing %d\n", (yyvsp[(2) - (2)].tptr)); (yyval.stmtptr)=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    (yyval.stmtptr)->isWhile=0;
+       (yyval.stmtptr)->isFunc=0;
 	    sprintf((yyval.stmtptr)->bodyCode,"li $v0, 1\nlw $a0, %s($t8)\nsyscall\naddi $a0, $0, 0xA\naddi $v0, $0, 0xB\nsyscall", (yyvsp[(2) - (2)].tptr)->addr);
 	    (yyval.stmtptr)->down=NULL;;}
     break;
@@ -1461,14 +1495,14 @@ yyreduce:
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 90 "calc.y"
+#line 125 "calc.y"
     { yyerrok; ;}
     break;
 
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 98 "calc.y"
+#line 133 "calc.y"
     {(yyval.argsptr)=(struct ArgsNode *) malloc(sizeof(struct ArgsNode));
                               (yyval.argsptr)->singl=1;(yyval.argsptr)->left=(yyvsp[(1) - (1)].argptr),(yyval.argsptr)->right=NULL;;}
     break;
@@ -1476,7 +1510,7 @@ yyreduce:
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 100 "calc.y"
+#line 135 "calc.y"
     {printf("ICameHERE  arglist\n");(yyval.argsptr)=(struct ArgsNode *) malloc(sizeof(struct ArgsNode));
                                     (yyval.argsptr)->singl=0;(yyval.argsptr)->left=(yyvsp[(1) - (3)].argptr),(yyval.argsptr)->right=(yyvsp[(3) - (3)].argsptr); ;}
     break;
@@ -1484,7 +1518,7 @@ yyreduce:
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 103 "calc.y"
+#line 138 "calc.y"
     {(yyval.argptr)=(struct ArgNode *) malloc(sizeof(struct ArgNode));
                        
                         sprintf((yyval.argptr)->argcode, "addi $a%d, $zero, %s($t8)",argcount,(yyvsp[(1) - (1)].tptr)->addr);argcount=(argcount+1)%4;if(argcount==0)argcount=1;
@@ -1494,56 +1528,56 @@ yyreduce:
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 112 "calc.y"
+#line 147 "calc.y"
     { sprintf((yyval.c),"%s",(yyvsp[(1) - (1)].nData));count=(count+1)%2;;}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 113 "calc.y"
+#line 148 "calc.y"
     { sprintf((yyval.c),"%s\n%s\nadd $t0, $t0, $t1",(yyvsp[(1) - (3)].nData),(yyvsp[(3) - (3)].nData));;}
     break;
 
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 114 "calc.y"
+#line 149 "calc.y"
     { sprintf((yyval.c),"%s\n%s\nsub $t0, $t0, $t1",(yyvsp[(1) - (3)].nData),(yyvsp[(3) - (3)].nData));;}
     break;
 
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 115 "calc.y"
+#line 150 "calc.y"
     { sprintf((yyval.c),"%s\n%s\nmul $t0, $t0, $t1",(yyvsp[(1) - (3)].nData),(yyvsp[(3) - (3)].nData));;}
     break;
 
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 116 "calc.y"
+#line 151 "calc.y"
     { sprintf((yyval.c),"%s\n%s\ndiv $t0, $t0, $t1",(yyvsp[(1) - (3)].nData),(yyvsp[(3) - (3)].nData));;}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 118 "calc.y"
+#line 153 "calc.y"
     {sprintf((yyval.nData),"li $t%d, %d",count,(yyvsp[(1) - (1)].val));count=(count+1)%2;;}
     break;
 
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 119 "calc.y"
+#line 154 "calc.y"
     {sprintf((yyval.nData), "lw $t%d, %s($t8)",count,(yyvsp[(1) - (1)].tptr)->addr);count=(count+1)%2;;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1547 "calc.tab.c"
+#line 1581 "calc.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1755,7 +1789,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 122 "calc.y"
+#line 157 "calc.y"
 
 
 void StmtsTrav(stmtsptr ptr){
@@ -1772,10 +1806,23 @@ void StmtTrav(stmtptr ptr){
    int ws,nj;
    printf("stmt\n");
    if(ptr==NULL) return;
-   if(ptr->isWhile==0){fprintf(fp,"%s\n",ptr->bodyCode);}
-   else{ws=whileStart; whileStart++;nj=nextJump;nextJump++;
-     fprintf(fp,"LabStartWhile%d:%s\n%s NextPart%d\n",ws,ptr->initCode,ptr->initJumpCode,nj);StmtsTrav(ptr->down);
-     fprintf(fp,"j LabStartWhile%d\nNextPart%d:\n",ws,nj);}
+   if(ptr->isWhile==0){
+      if (ptr->isFunc==0){fprintf(fp,"%s\n",ptr->bodyCode);}
+      else if (ptr->isFunc==1){
+         int fs=funcStart; funcStart++;
+         fprintf(fp,"FuncName%d:\n",fs);
+         StmtsTrav(ptr->down);
+         fprintf(fp,"jr $ra");
+
+      }
+      
+   }
+   else{
+      ws=whileStart; whileStart++;nj=nextJump;nextJump++;
+      fprintf(fp,"LabStartWhile%d:%s\n%s NextPart%d\n",ws,ptr->initCode,ptr->initJumpCode,nj);
+      StmtsTrav(ptr->down);
+      fprintf(fp,"j LabStartWhile%d\nNextPart%d:\n",ws,nj);
+   }
 	  
 }
    
@@ -1787,7 +1834,8 @@ int main ()
    fprintf(fp,".data\n\n.text\nmain:\n\n\nli $t8,268500992\n");
    yyparse ();
    StmtsTrav(final);
-   fprintf(fp,"\nli $v0,10\nsyscall\n");
+   fprintf(fp,"\nli $v0,10\nsyscall\n\n\n");
+   StmtsTrav(funcfinal);
    fclose(fp);
    // https://stackoverflow.com/questions/45186052/how-to-write-yacc-grammar-rules-to-identify-function-definitions-vs-function-cal
 }

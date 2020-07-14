@@ -19,7 +19,7 @@ id [a-z]+
 "print" {return PRINT;}
 "<"   {yylval.val=2;return RELOP;}
 {number} {sscanf(yytext,"%d",&yylval.val);printf("%d  %d\n",yylval.val,yytext);return NUM;}
-{id} {symrec *s;s=getsym(yytext); if(s==0) s=putsym(yytext,VAR);yylval.tptr=s;s->type = 0;s->retval = 101;return VAR;}
+{id} {symrec *s;s=getsym(yytext); if(s==0) s=putsym(yytext,VAR);s->type = 0;s->retval = 101;yylval.tptr=s;return VAR;}
 
 \n|.  {return yytext[0];}
 %%

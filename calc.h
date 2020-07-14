@@ -50,6 +50,7 @@ struct StmtsNode{
 
 struct StmtNode{
     int isWhile;
+    int isFunc;
     char initCode[100];
     char initJumpCode[20];
     char bodyCode[1000];

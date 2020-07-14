@@ -1,5 +1,14 @@
 a = 2
 b = 4
+
+
+func(a,b){
+    print a
+    return b
+}
+
 x = func(a,b)
+
+
 
 

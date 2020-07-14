@@ -646,7 +646,7 @@ YY_RULE_SETUP
 case 6:
 YY_RULE_SETUP
 #line 22 "tok.l"
-{symrec *s;s=getsym(yytext); if(s==0) s=putsym(yytext,VAR);yylval.tptr=s;s->type = 0;s->retval = 101;return VAR;}
+{symrec *s;s=getsym(yytext); if(s==0) s=putsym(yytext,VAR);s->type = 0;s->retval = 101;yylval.tptr=s;return VAR;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
