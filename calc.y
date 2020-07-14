@@ -191,7 +191,7 @@ int main ()
    fprintf(fp,"\nli $v0,10\nsyscall\n\n\n");
    StmtsTrav(funcfinal);
    fclose(fp);
-   // https://stackoverflow.com/questions/45186052/how-to-write-yacc-grammar-rules-to-identify-function-definitions-vs-function-cal
+   
 }
 
 void yyerror (char *s)  /* Called by yyparse on error */

@@ -1,3 +1,30 @@
+program: 'program' TEXT ';' constants                  {$$ = $4;}
+
+constants: 'const' assign variables        
+        | variables                                     {$$ = $4;}
+
+assign: VAR '=' exp ';'                                 {}
+        |                                               {}
+
+variables: 'var' define body                           {}
+        | body
+
+define: vars ':' TYPE ';' define                        {}
+        |                                               {}
+
+vars: VAR ',' vars                                      {}
+        |                                               {}
+
+body: 'function' VAR '(' define ')' : TYPE ';' 'begin' constants 'end' body 
+        | 'procedure' VAR '(' define ')' : TYPE ';' 'begin' constants 'end' body
+        | 'begin' stmts 'end'
+        | 
+
+stmts: stmt ';' stmts                                   
+        | stmt
+        |
+        
+
 /* Function block */
 function: VAR'(' args ')' '{' stmts '}'          {printf("%s","ICameHERE  just function")}
 ;
@@ -27,3 +54,9 @@ printf("ICameHERE  functioncall\n");$$=(struct StmtNode *) malloc(sizeof(struct 
        sprintf($$->bodyCode,"%s\nsw $t0, %s($t8)\n\n",tmp,$1->addr);
 
 	    $$->down=NULL;
+
+
+
+// https://stackoverflow.com/questions/45186052/how-to-write-yacc-grammar-rules-to-identify-function-definitions-vs-function-cal
+
+https://github.com/stardust95/TinyCompiler/blob/master/grammar.y

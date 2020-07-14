@@ -5,7 +5,7 @@ gcc calc.tab.c lex.yy.c -lfl
 
 -------------------
 How to run:
-./a.out<test.prog
+./a.out<Fibonocci.prog
 
 The output will be asmb.asm. Load asmb.asm in Mars, assemble and run.
 ---------------------
