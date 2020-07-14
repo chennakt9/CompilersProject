@@ -1,0 +1,17 @@
+/* Function block */
+function: VAR'(' args ')' '{' stmts '}'          {printf("%s","ICameHERE  just function")}
+;
+
+
+
+arglist:  arglist ',' arg            {}
+    | arg                            {}
+    ;
+arg:    VAR
+;
+
+/* Function Call Block */
+functioncall :   VAR'('')'  {printf("ICameHERE  functioncall\n");$1->type = 1; }
+               | VAR'('args')'  {printf("ICameHERE  functioncall\n");$1->type = 1; }
+
+;
