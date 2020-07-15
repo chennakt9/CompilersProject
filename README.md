@@ -1,3 +1,9 @@
+### Team Members
+* Peeyush Dyavarashetty (17110053)
+* Prudhvi Kakumani (17110066)
+* Pittala Nikhil (17110108)
+* Chenna Kesava  (17110039)
+
 #### How to compile:
 ```sh
 bison -d calc.y
