@@ -49,10 +49,12 @@
      PROCEDURE_KW = 265,
      IF_KW = 266,
      THEN_KW = 267,
-     NUM = 268,
-     RELOP = 269,
-     WHILE = 270,
-     ID = 271
+     FOR_KW = 268,
+     TO_KW = 269,
+     NUM = 270,
+     RELOP = 271,
+     WHILE = 272,
+     ID = 273
    };
 #endif
 
@@ -79,7 +81,7 @@ struct ArgsNode *argsptr;
 
 
 /* Line 1676 of yacc.c  */
-#line 83 "calc.tab.h"
+#line 85 "calc.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

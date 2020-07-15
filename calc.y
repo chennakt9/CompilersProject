@@ -40,13 +40,16 @@ struct ArgsNode *argsptr;
 %token PROGRAM
 %token  WRITELN
 %token INT
-%token VAR_KW   /* "var" keyword */
-%token BEGIN_KW  /* "begin" keyword */
-%token END_KW    /* "end" keyword */
-%token DO_KW     /* "do" keyword */
-%token PROCEDURE_KW   /* "procedure" keyword */
-%token IF_KW          /* If keyword*/
-%token THEN_KW         /*Then keyword*/
+%token VAR_KW           /* "var" keyword */
+%token BEGIN_KW         /* "begin" keyword */
+%token END_KW           /* "end" keyword */
+%token DO_KW            /* "do" keyword */
+%token PROCEDURE_KW     /* "procedure" keyword */
+%token IF_KW            /* "if" keyword*/
+%token THEN_KW          /*"then" keyword*/
+%token FOR_KW           /*"for" Keyword*/
+%token TO_KW           /*"to" keyword*/
+
 %token  <val> NUM        /* Integer   */
 %token <val> RELOP
 %token  WHILE
@@ -126,6 +129,13 @@ stmt:
 	    sprintf($$->initCode,"lw $t0, %s($t8)\nlw $t1, %s($t8)\n", $3->addr,$5->addr);
 	    sprintf($$->initJumpCode,"bge $t0, $t1,");
 	    $$->down=$10;}
+
+       | FOR_KW ID '=' ID TO_KW  ID DO_KW '\n' BEGIN_KW stmts END_KW   '\n'      {$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+	                                                                     $$->isWhile=1;
+                                                                        $$->isFunc = 0; 
+                                                                        sprintf($$->initCode,"lw $t0, %s($t8)\nlw $t1, %s($t8)\n", $4->addr,$6->addr);
+                                                                        sprintf($$->initJumpCode,"add $t0, 1, $t0\nbge $t0, $t1,");
+                                                                        $$->down=$10;}
 
          | ID '=' exp ';' '\n'   {printf("Assignment statement\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;

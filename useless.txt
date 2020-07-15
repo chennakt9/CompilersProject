@@ -1,4 +1,12 @@
 
+| FOR ID '=' ID TO ID DO_KW BEGIN_KW stmts END_KW         {$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+	                                                                     $$->isWhile=1;
+                                                                        $$->isFunc = 0; 
+                                                                        sprintf($$->initCode,"lw $t0, %s($t8)\nlw $t1, %s($t8)\n", $4->addr,$6->addr);
+                                                                        sprintf($$->initJumpCode,"add $t0, 1, $t0\nbge $t0, $t1,");
+                                                                        $$->down=$9;}
+
+                                                                        
 
 
 
