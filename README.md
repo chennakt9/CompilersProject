@@ -57,19 +57,19 @@ sw $t0,8($t8)
 lw $t0, 4($t8)
 lw $t1, 8($t8)
 
-blt $t0, $t1,IfLabel0
-IfLabel0:
-lw $t0, 4($t8)
-lw $t1, 8($t8)
-add $t0, $t0, $t1
-sw $t0,12($t8)
+blt $t0, $t1,IfLabel0<br>
+IfLabel0:<br>
+lw $t0, 4($t8)<br>
+lw $t1, 8($t8)<br>
+add $t0, $t0, $t1<br>
+sw $t0,12($t8)<br>
 
 
-li $v0, 1
-lw $a0, 12($t8)
-syscall
-addi $a0, $0, 0xA
-addi $v0, $0, 0xB
+li $v0, 1<br>
+lw $a0, 12($t8)<br>
+syscall<br>
+addi $a0, $0, 0xA<br>
+addi $v0, $0, 0xB<br>
 syscall
 
 
