@@ -39,18 +39,20 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     WRITELN = 258,
-     PROGRAM = 259,
+     PROGRAM = 258,
+     WRITELN = 259,
      INT = 260,
      VAR_KW = 261,
      BEGIN_KW = 262,
      END_KW = 263,
      DO_KW = 264,
      PROCEDURE_KW = 265,
-     NUM = 266,
-     RELOP = 267,
-     WHILE = 268,
-     ID = 269
+     IF_KW = 266,
+     THEN_KW = 267,
+     NUM = 268,
+     RELOP = 269,
+     WHILE = 270,
+     ID = 271
    };
 #endif
 
@@ -61,7 +63,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 24 "calc.y"
+#line 25 "calc.y"
 
 int   val;  /* For returning numbers.                   */
 struct symrec  *tptr;   /* For returning symbol-table pointers      */
@@ -77,7 +79,7 @@ struct ArgsNode *argsptr;
 
 
 /* Line 1676 of yacc.c  */
-#line 81 "calc.tab.h"
+#line 83 "calc.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

@@ -1,0 +1,12 @@
+program SIMPLE_PROCEDURE;
+
+var
+a : integer;
+b : integer;
+
+begin
+
+a = 3;
+
+
+end

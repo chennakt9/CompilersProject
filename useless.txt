@@ -1,5 +1,7 @@
 
 
+
+
   VAR_KW stmts ';' '\n' 
 
 program: 'program' TEXT ';' constants                  {$$ = $4;}

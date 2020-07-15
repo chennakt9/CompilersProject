@@ -25,8 +25,10 @@ id [a-zA-Z_]+
 "end"     {return END_KW;}
 "do"      {return DO_KW;}
 "procedure" {return PROCEDURE_KW;}
+"if"      {return IF_KW;}
+"then"    {return THEN_KW;}
 "<"   {yylval.val=2;return RELOP;}
-{number} {return NUM;}
+{number} {sscanf(yytext,"%d",&yylval.val);return NUM;}
 {id} {symrec *s;s=getsym(yytext); if(s==0) s=putsym(yytext,ID);s->type = 0;s->retval = 101;yylval.tptr=s;return ID;}
 [\n]        {yylineno++;return yytext[0];}
 .  {return yytext[0];}

@@ -11,6 +11,7 @@ int funcStart=0;
 
 int count=0;
 int argcount=1;
+int ifcount=0;
 int labelCount=0;
 FILE *fp;
 struct StmtsNode *final;
@@ -36,14 +37,16 @@ struct ArgsNode *argsptr;
 
 
 /* The above will cause a #line directive to come in calc.tab.h.  The #line directive is typically used by program generators to cause error messages to refer to the original source file instead of to the generated program. */
-
-%token  WRITELN '('%token PROGRAM
+%token PROGRAM
+%token  WRITELN
 %token INT
-%token VAR_KW
-%token BEGIN_KW
-%token END_KW
-%token DO_KW
-%token PROCEDURE_KW
+%token VAR_KW   /* "var" keyword */
+%token BEGIN_KW  /* "begin" keyword */
+%token END_KW    /* "end" keyword */
+%token DO_KW     /* "do" keyword */
+%token PROCEDURE_KW   /* "procedure" keyword */
+%token IF_KW          /* If keyword*/
+%token THEN_KW         /*Then keyword*/
 %token  <val> NUM        /* Integer   */
 %token <val> RELOP
 %token  WHILE
@@ -87,7 +90,7 @@ stmt:
 	    sprintf($$->bodyCode,"\n");
 	    $$->down=$3;}
 
-         | BEGIN_KW '\n' stmts  END_KW  '\n'                {printf("Main Function%s\n",$3);$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         | BEGIN_KW '\n' stmts  END_KW  '\n'                {printf("Main Function\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;
        $$->isFunc=0;
 
@@ -107,6 +110,15 @@ stmt:
          funcfinal->singl=1;funcfinal->left=temp,funcfinal->right=NULL;
 
          }   /* Function declaration w/ params*/
+
+        | IF_KW '(' ID RELOP ID ')' THEN_KW '\n' BEGIN_KW stmts  END_KW '\n'                     {printf("If Statement\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+	    $$->isWhile=0;
+       $$->isFunc=0;
+       $$->isIf=1;
+       
+       sprintf($$->initCode,"lw $t0, %s($t8)\nlw $t1, %s($t8)\n", $3->addr,$5->addr);
+	    sprintf($$->initJumpCode,"blt $t0, $t1,");
+	    $$->down=$10;}
 
         | WHILE '(' ID RELOP ID ')' DO_KW  '\n' BEGIN_KW stmts END_KW '\n' {printf("%s","While Loop\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=1;
@@ -202,7 +214,9 @@ void StmtTrav(stmtptr ptr){
    if(ptr->isWhile==0){
       if (ptr->isFunc==0){
          fprintf(fp,"%s\n",ptr->bodyCode);
-
+         if(ptr->isIf==1){
+            fprintf(fp,"%s\n%sIfLabel%d\nIfLabel%d:\n",ptr->initCode,ptr->initJumpCode,ifcount,ifcount);
+         }
          if(ptr->down!=NULL){
             StmtsTrav(ptr->down);
          }
