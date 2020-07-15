@@ -1,11 +1,20 @@
-m=1
-n=10
+program SIMPLE_STRAIGHT_LINE_PROGRAM;
 
-while(m<n){
-    m = m+1
-    print m
-}
+var
+m : integer;
+n : integer;
+
+begin
+
+m=1;
+n=10;
+
+while(m<n) do
+begin
+    m = m+1;
+    writeln(m);
+end
 
 
-
+end
 

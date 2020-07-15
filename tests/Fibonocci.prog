@@ -1,24 +1,24 @@
 program PRINTING_N_FIBANOCCI_NUMBERS;
 
 var
-fprev : integer
-fnext : integer
+fprev : integer;
+fnext : integer;
 
 begin
 
-fprev=0
-fnext=1
-n=15
-m=1
+fprev=0;
+fnext=1;
+n=15;
+m=1;
 while(m<n) do
 begin
-    temp=fprev
-    fprev=fnext
-    fnext=temp+fnext
+    temp=fprev;
+    fprev=fnext;
+    fnext=temp+fnext;
 
-    writeln(fnext)
+    writeln(fnext);
 
-    m=m+1
+    m=m+1;
 end
 
 end

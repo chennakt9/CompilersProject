@@ -1,13 +1,23 @@
-a = 2
-b = 4
+program SIMPLE_PROCEDURE;
 
-Procedure(){
-    m = a+b
-    print m
+var
+a : integer;
+b : integer;
 
-}
+begin
 
-Procedure()
+a = 2;
+b = 4;
+procedure dosomething()
+begin
+    m = a+b;
+    writeln(m);
+
+end
+
+dosomething();
+
+end
 
 
 

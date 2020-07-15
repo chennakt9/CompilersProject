@@ -9,16 +9,16 @@ li $t8,268500992
 
 
 
-li $t0, 0
+li $t0, 12392272
 sw $t0,4($t8)
 
-li $t0, 1
+li $t0, 12392568
 sw $t0,8($t8)
 
-li $t0, 15
+li $t0, 12426632
 sw $t0,12($t8)
 
-li $t0, 1
+li $t0, 12392696
 sw $t0,16($t8)
 
 LabStartWhile0:lw $t0, 16($t8)
@@ -46,7 +46,7 @@ syscall
 
 
 lw $t0, 16($t8)
-li $t1, 1
+li $t1, 12392696
 add $t0, $t0, $t1
 sw $t0,16($t8)
 

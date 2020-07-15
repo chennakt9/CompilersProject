@@ -46,10 +46,11 @@
      BEGIN_KW = 262,
      END_KW = 263,
      DO_KW = 264,
-     NUM = 265,
-     RELOP = 266,
-     WHILE = 267,
-     ID = 268
+     PROCEDURE_KW = 265,
+     NUM = 266,
+     RELOP = 267,
+     WHILE = 268,
+     ID = 269
    };
 #endif
 
@@ -76,7 +77,7 @@ struct ArgsNode *argsptr;
 
 
 /* Line 1676 of yacc.c  */
-#line 80 "calc.tab.h"
+#line 81 "calc.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

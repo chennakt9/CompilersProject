@@ -43,6 +43,7 @@ struct ArgsNode *argsptr;
 %token BEGIN_KW
 %token END_KW
 %token DO_KW
+%token PROCEDURE_KW
 %token  <val> NUM        /* Integer   */
 %token <val> RELOP
 %token  WHILE
@@ -62,11 +63,13 @@ struct ArgsNode *argsptr;
 %start prog
 
 
+
+
 /* Grammar follows */
 
 %%
 
-prog: PROGRAM ID ';' '\n'stmts {printf("Hiiiii %d End",($5->left));final=$5;}
+prog: PROGRAM ID ';' '\n'stmts {printf("Start of the program");final=$5;}
 
 stmts: stmt {$$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
    $$->singl=1;$$->left=$1,$$->right=NULL;}
@@ -77,14 +80,14 @@ stmts: stmt {$$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
 stmt:   
         '\n' {$$=NULL;}
 
-        | VAR_KW '\n' declr_stmts    '\n'                {$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+        | VAR_KW '\n' declr_stmts  '\n'                {$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;
        $$->isFunc=0;
 
 	    sprintf($$->bodyCode,"\n");
 	    $$->down=$3;}
 
-         | BEGIN_KW '\n' stmts  END_KW  '\n'                {printf("laksdjfldsk%s\n",$3);$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         | BEGIN_KW '\n' stmts  END_KW  '\n'                {printf("Main Function%s\n",$3);$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;
        $$->isFunc=0;
 
@@ -92,27 +95,27 @@ stmt:
 	    $$->down=$3;}
        
 
-        | ID'(' args ')' '{' stmts '}'          {printf("%s","ICameHERE  just function\n");$$=NULL;
+        | PROCEDURE_KW ID'(' args ')' '\n' BEGIN_KW  stmts END_KW '\n'          {printf("%s","Function Declaration\n");$$=NULL;
 
          struct StmtNode *temp;
          temp=(struct StmtNode *) malloc(sizeof(struct StmtNode));
          temp->isWhile=0;
          temp->isFunc=1;
          //  sprintf(temp->bodyCode,"%s\nsw $t0,%s($t8)\n", $3, $1->addr);
-         temp->down=$6;
+         temp->down=$8;
          funcfinal = (struct StmtsNode *) malloc(sizeof(struct StmtsNode));
          funcfinal->singl=1;funcfinal->left=temp,funcfinal->right=NULL;
 
          }   /* Function declaration w/ params*/
 
-        | WHILE '(' ID RELOP ID ')' DO_KW  '\n' BEGIN_KW '\n' stmts END_KW '\n' {$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+        | WHILE '(' ID RELOP ID ')' DO_KW  '\n' BEGIN_KW stmts END_KW '\n' {printf("%s","While Loop\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=1;
        $$->isFunc=0;
 	    sprintf($$->initCode,"lw $t0, %s($t8)\nlw $t1, %s($t8)\n", $3->addr,$5->addr);
 	    sprintf($$->initJumpCode,"bge $t0, $t1,");
-	    $$->down=$11;}
+	    $$->down=$10;}
 
-         | ID '=' exp '\n'   {printf("Test1");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         | ID '=' exp ';' '\n'   {printf("Assignment statement\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;
        $$->isFunc=0;
 
@@ -122,7 +125,7 @@ stmt:
          
                                                                      // lw $t0,   <--4($t8)
                                                                      // sw $t0,-->  8($t8)
-         | ID'('args')'  '\n' {printf("ICameHERE  functioncall\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         | ID'('args')' ';' '\n' {printf("Function calling\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;
        $$->isFunc=0;
 	    sprintf($$->bodyCode,"jal FuncName%d\n", funcStart);
@@ -131,25 +134,25 @@ stmt:
 
 
          
-         | WRITELN'('ID')'	'\n'		{printf("Printing %d\n", $3); $$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         | WRITELN'('ID')'	';' '\n'		{printf("Print Statemant\n"); $$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;
        $$->isFunc=0;
 	    sprintf($$->bodyCode,"\nli $v0, 1\nlw $a0, %s($t8)\nsyscall\naddi $a0, $0, 0xA\naddi $v0, $0, 0xB\nsyscall\n\n", $3->addr);
 	    $$->down=NULL;}
 
-         | error '\n' { yyerrok; }
+         | error '\n' {yyerrok; }
 ;
 /* Invariant: we store the result of an expression in R0 */
 
 
-declr_stmts: ID ':' INT '\n' {
+declr_stmts: ID ':' INT ';' '\n' {
    
    $$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
    $$->singl=1;$$->left=NULL,$$->right=NULL;
    }
-            | ID ':' INT '\n' declr_stmts  {
+            | ID ':' INT ';' '\n' declr_stmts  {
                $$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
-   $$->singl=0;$$->left=NULL,$$->right=$5;
+   $$->singl=0;$$->left=NULL,$$->right=$6;
    }
             
 ;
@@ -236,9 +239,10 @@ int main ()
    
 }
 
-void yyerror (char *s)  /* Called by yyparse on error */
-{
-  printf ("Error : %s\n", s);
+void yyerror(char *s)
+{   
+    extern int yylineno;
+    fprintf(stderr,"\nAt line : %d %s  \n\n",yylineno,s);
 }
 
 

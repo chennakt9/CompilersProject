@@ -5,6 +5,7 @@
 #include <string.h>
 
 int Adr=0;
+int yylineno=1;
 symrec *sym_table = (symrec *)0;
 %}
 
@@ -23,11 +24,13 @@ id [a-zA-Z_]+
 "begin"   {return BEGIN_KW;}
 "end"     {return END_KW;}
 "do"      {return DO_KW;}
+"procedure" {return PROCEDURE_KW;}
 "<"   {yylval.val=2;return RELOP;}
-{number} {sscanf(yytext,"%d",&yylval.val);printf("%d  %d\n",yylval.val,yytext);return NUM;}
+{number} {return NUM;}
 {id} {symrec *s;s=getsym(yytext); if(s==0) s=putsym(yytext,ID);s->type = 0;s->retval = 101;yylval.tptr=s;return ID;}
+[\n]        {yylineno++;return yytext[0];}
+.  {return yytext[0];}
 
-\n|.  {return yytext[0];}
 %%
 
 /* The symbol table: a chain of `struct symrec'.  */
