@@ -39,11 +39,17 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     PRINT = 258,
-     NUM = 259,
-     RELOP = 260,
-     WHILE = 261,
-     VAR = 262
+     WRITELN = 258,
+     PROGRAM = 259,
+     INT = 260,
+     VAR_KW = 261,
+     BEGIN_KW = 262,
+     END_KW = 263,
+     DO_KW = 264,
+     NUM = 265,
+     RELOP = 266,
+     WHILE = 267,
+     ID = 268
    };
 #endif
 
@@ -70,7 +76,7 @@ struct ArgsNode *argsptr;
 
 
 /* Line 1676 of yacc.c  */
-#line 74 "calc.tab.h"
+#line 80 "calc.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

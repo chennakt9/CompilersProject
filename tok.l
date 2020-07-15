@@ -10,16 +10,22 @@ symrec *sym_table = (symrec *)0;
 
 
 number [0-9]+
-id [a-z]+
+id [a-zA-Z_]+
 
 
 %%
 [ ] {}
 "while" {return WHILE;}
-"print" {return PRINT;}
+"writeln" {return WRITELN;}
+"program" {return PROGRAM;}
+"integer" {return INT;}
+"var"     {return VAR_KW;}
+"begin"   {return BEGIN_KW;}
+"end"     {return END_KW;}
+"do"      {return DO_KW;}
 "<"   {yylval.val=2;return RELOP;}
 {number} {sscanf(yytext,"%d",&yylval.val);printf("%d  %d\n",yylval.val,yytext);return NUM;}
-{id} {symrec *s;s=getsym(yytext); if(s==0) s=putsym(yytext,VAR);s->type = 0;s->retval = 101;yylval.tptr=s;return VAR;}
+{id} {symrec *s;s=getsym(yytext); if(s==0) s=putsym(yytext,ID);s->type = 0;s->retval = 101;yylval.tptr=s;return ID;}
 
 \n|.  {return yytext[0];}
 %%

@@ -37,27 +37,37 @@ struct ArgsNode *argsptr;
 
 /* The above will cause a #line directive to come in calc.tab.h.  The #line directive is typically used by program generators to cause error messages to refer to the original source file instead of to the generated program. */
 
-%token  PRINT
+%token  WRITELN '('%token PROGRAM
+%token INT
+%token VAR_KW
+%token BEGIN_KW
+%token END_KW
+%token DO_KW
 %token  <val> NUM        /* Integer   */
 %token <val> RELOP
 %token  WHILE
-%token <tptr> VAR 
+%token <tptr> ID 
 %type  <c>  exp
 %type <nData> x
 %type <stmtsptr> stmts
 %type <stmtptr> stmt
 %type <argsptr> args
 %type <argptr> arg
+%type <stmtsptr> declr_stmts
 
 %right '='
 %left '-' '+'
 %left '*' '/'
 
+%start prog
+
 
 /* Grammar follows */
 
 %%
-prog: stmts {printf("Hiiiii %d End",($1->left));final=$1;}
+
+prog: PROGRAM ID ';' '\n'stmts {printf("Hiiiii %d End",($5->left));final=$5;}
+
 stmts: stmt {$$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
    $$->singl=1;$$->left=$1,$$->right=NULL;}
 | stmt stmts {$$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
@@ -67,7 +77,22 @@ stmts: stmt {$$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
 stmt:   
         '\n' {$$=NULL;}
 
-        | VAR'(' args ')' '{' stmts '}'          {printf("%s","ICameHERE  just function\n");$$=NULL;
+        | VAR_KW '\n' declr_stmts    '\n'                {$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+	    $$->isWhile=0;
+       $$->isFunc=0;
+
+	    sprintf($$->bodyCode,"\n");
+	    $$->down=$3;}
+
+         | BEGIN_KW '\n' stmts  END_KW  '\n'                {printf("laksdjfldsk%s\n",$3);$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+	    $$->isWhile=0;
+       $$->isFunc=0;
+
+	    sprintf($$->bodyCode,"\n");
+	    $$->down=$3;}
+       
+
+        | ID'(' args ')' '{' stmts '}'          {printf("%s","ICameHERE  just function\n");$$=NULL;
 
          struct StmtNode *temp;
          temp=(struct StmtNode *) malloc(sizeof(struct StmtNode));
@@ -80,14 +105,14 @@ stmt:
 
          }   /* Function declaration w/ params*/
 
-        | WHILE '(' VAR RELOP VAR ')' '{' stmts '}' '\n' {$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+        | WHILE '(' ID RELOP ID ')' DO_KW  '\n' BEGIN_KW '\n' stmts END_KW '\n' {$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=1;
        $$->isFunc=0;
 	    sprintf($$->initCode,"lw $t0, %s($t8)\nlw $t1, %s($t8)\n", $3->addr,$5->addr);
 	    sprintf($$->initJumpCode,"bge $t0, $t1,");
-	    $$->down=$8;}
+	    $$->down=$11;}
 
-         | VAR '=' exp '\n'   {printf("Test1");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         | ID '=' exp '\n'   {printf("Test1");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;
        $$->isFunc=0;
 
@@ -97,7 +122,7 @@ stmt:
          
                                                                      // lw $t0,   <--4($t8)
                                                                      // sw $t0,-->  8($t8)
-         | VAR'('args')'  '\n' {printf("ICameHERE  functioncall\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         | ID'('args')'  '\n' {printf("ICameHERE  functioncall\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;
        $$->isFunc=0;
 	    sprintf($$->bodyCode,"jal FuncName%d\n", funcStart);
@@ -106,10 +131,10 @@ stmt:
 
 
          
-         | PRINT VAR 	'\n'		{printf("Printing %d\n", $2); $$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         | WRITELN'('ID')'	'\n'		{printf("Printing %d\n", $3); $$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;
        $$->isFunc=0;
-	    sprintf($$->bodyCode,"\nli $v0, 1\nlw $a0, %s($t8)\nsyscall\naddi $a0, $0, 0xA\naddi $v0, $0, 0xB\nsyscall\n\n", $2->addr);
+	    sprintf($$->bodyCode,"\nli $v0, 1\nlw $a0, %s($t8)\nsyscall\naddi $a0, $0, 0xA\naddi $v0, $0, 0xB\nsyscall\n\n", $3->addr);
 	    $$->down=NULL;}
 
          | error '\n' { yyerrok; }
@@ -117,6 +142,17 @@ stmt:
 /* Invariant: we store the result of an expression in R0 */
 
 
+declr_stmts: ID ':' INT '\n' {
+   
+   $$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
+   $$->singl=1;$$->left=NULL,$$->right=NULL;
+   }
+            | ID ':' INT '\n' declr_stmts  {
+               $$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
+   $$->singl=0;$$->left=NULL,$$->right=$5;
+   }
+            
+;
 
 
 
@@ -125,7 +161,7 @@ args:  arg                        {$$=(struct ArgsNode *) malloc(sizeof(struct A
          | arg ',' args           {printf("ICameHERE  arglist\n");$$=(struct ArgsNode *) malloc(sizeof(struct ArgsNode));
                                     $$->singl=0;$$->left=$1,$$->right=$3; }
     ;
-arg:    {$$=NULL;}| VAR                            {$$=(struct ArgNode *) malloc(sizeof(struct ArgNode));
+arg:    {$$=NULL;}| ID                            {$$=(struct ArgNode *) malloc(sizeof(struct ArgNode));
                        
                         sprintf($$->argcode, "addi $a%d, $zero, %s($t8)",argcount,$1->addr);argcount=(argcount+1)%4;if(argcount==0)argcount=1;
                         $$->down=NULL;}
@@ -141,13 +177,13 @@ exp:      x                { sprintf($$,"%s",$1);count=(count+1)%2;}
         | x '/' x        { sprintf($$,"%s\n%s\ndiv $t0, $t0, $t1",$1,$3);}
 ;
 x:   NUM {sprintf($$,"li $t%d, %d",count,$1);count=(count+1)%2;}
-| VAR {sprintf($$, "lw $t%d, %s($t8)",count,$1->addr);count=(count+1)%2;}
+| ID {sprintf($$, "lw $t%d, %s($t8)",count,$1->addr);count=(count+1)%2;}
    ;
 /* End of grammar */
 %%
 
 void StmtsTrav(stmtsptr ptr){
-  printf("stmts\n");
+//   printf("stmts\n");
   if(ptr==NULL) return;
 	  if(ptr->singl==1)StmtTrav(ptr->left);
 	  else{
@@ -158,10 +194,16 @@ void StmtsTrav(stmtsptr ptr){
 
 void StmtTrav(stmtptr ptr){
    int ws,nj;
-   printf("stmt\n");
+   // printf("stmt\n");
    if(ptr==NULL) return;
    if(ptr->isWhile==0){
-      if (ptr->isFunc==0){fprintf(fp,"%s\n",ptr->bodyCode);}
+      if (ptr->isFunc==0){
+         fprintf(fp,"%s\n",ptr->bodyCode);
+
+         if(ptr->down!=NULL){
+            StmtsTrav(ptr->down);
+         }
+      }
       else if (ptr->isFunc==1){
          int fs=funcStart; funcStart++;
          fprintf(fp,"FuncName%d:\n",fs);

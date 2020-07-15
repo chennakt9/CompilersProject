@@ -1,15 +1,25 @@
+program PRINTING_N_FIBANOCCI_NUMBERS;
+
+var
+fprev : integer
+fnext : integer
+
+begin
+
 fprev=0
 fnext=1
 n=15
 m=1
-while(m<n){
+while(m<n) do
+begin
     temp=fprev
     fprev=fnext
     fnext=temp+fnext
 
-    print fnext
+    writeln(fnext)
 
     m=m+1
-}
+end
 
+end
 

@@ -1,3 +1,7 @@
+
+
+  VAR_KW stmts ';' '\n' 
+
 program: 'program' TEXT ';' constants                  {$$ = $4;}
 
 constants: 'const' assign variables        
@@ -54,6 +58,8 @@ printf("ICameHERE  functioncall\n");$$=(struct StmtNode *) malloc(sizeof(struct 
        sprintf($$->bodyCode,"%s\nsw $t0, %s($t8)\n\n",tmp,$1->addr);
 
 	    $$->down=NULL;
+
+
 
 
 

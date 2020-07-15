@@ -1,15 +1,15 @@
 a = 2
 b = 4
 
-
-
-func()
-
-func(){
-    print a
-    print b
+Procedure(){
+    m = a+b
+    print m
 
 }
+
+Procedure()
+
+
 
 
 
