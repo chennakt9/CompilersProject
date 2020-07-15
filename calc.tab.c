@@ -474,8 +474,8 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    78,    78,    80,    82,    87,    89,    96,   104,   117,
-     126,   133,   140,   150,   159,   165,   170,   175,   184,   186,
-     189,   189,   198,   199,   200,   201,   202,   204,   205
+     126,   133,   141,   151,   160,   166,   171,   176,   185,   187,
+     190,   190,   199,   200,   201,   202,   203,   205,   206
 };
 #endif
 
@@ -1531,16 +1531,17 @@ yyreduce:
 #line 133 "calc.y"
     {(yyval.stmtptr)=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	                                                                     (yyval.stmtptr)->isWhile=1;
-                                                                        (yyval.stmtptr)->isFunc = 0; 
+                                                                        (yyval.stmtptr)->isFunc = 0;
+                                                                        (yyval.stmtptr)->isFor = 1; 
                                                                         sprintf((yyval.stmtptr)->initCode,"lw $t0, %s($t8)\nlw $t1, %s($t8)\n", (yyvsp[(4) - (12)].tptr)->addr,(yyvsp[(6) - (12)].tptr)->addr);
-                                                                        sprintf((yyval.stmtptr)->initJumpCode,"add $t0, 1, $t0\nbge $t0, $t1,");
+                                                                        sprintf((yyval.stmtptr)->initJumpCode,"add $t0, $t0,1 \nbge $t0, $t1,");
                                                                         (yyval.stmtptr)->down=(yyvsp[(10) - (12)].stmtsptr);;}
     break;
 
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 140 "calc.y"
+#line 141 "calc.y"
     {printf("Assignment statement\n");(yyval.stmtptr)=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    (yyval.stmtptr)->isWhile=0;
        (yyval.stmtptr)->isFunc=0;
@@ -1552,7 +1553,7 @@ yyreduce:
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 150 "calc.y"
+#line 151 "calc.y"
     {printf("Function calling\n");(yyval.stmtptr)=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    (yyval.stmtptr)->isWhile=0;
        (yyval.stmtptr)->isFunc=0;
@@ -1563,7 +1564,7 @@ yyreduce:
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 159 "calc.y"
+#line 160 "calc.y"
     {printf("Print Statemant\n"); (yyval.stmtptr)=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    (yyval.stmtptr)->isWhile=0;
        (yyval.stmtptr)->isFunc=0;
@@ -1574,14 +1575,14 @@ yyreduce:
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 165 "calc.y"
+#line 166 "calc.y"
     {yyerrok; ;}
     break;
 
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 170 "calc.y"
+#line 171 "calc.y"
     {
    
    (yyval.stmtsptr)=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
@@ -1592,7 +1593,7 @@ yyreduce:
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 175 "calc.y"
+#line 176 "calc.y"
     {
                (yyval.stmtsptr)=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
    (yyval.stmtsptr)->singl=0;(yyval.stmtsptr)->left=NULL,(yyval.stmtsptr)->right=(yyvsp[(6) - (6)].stmtsptr);
@@ -1602,7 +1603,7 @@ yyreduce:
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 184 "calc.y"
+#line 185 "calc.y"
     {(yyval.argsptr)=(struct ArgsNode *) malloc(sizeof(struct ArgsNode));
                               (yyval.argsptr)->singl=1;(yyval.argsptr)->left=(yyvsp[(1) - (1)].argptr),(yyval.argsptr)->right=NULL;;}
     break;
@@ -1610,7 +1611,7 @@ yyreduce:
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 186 "calc.y"
+#line 187 "calc.y"
     {printf("ICameHERE  arglist\n");(yyval.argsptr)=(struct ArgsNode *) malloc(sizeof(struct ArgsNode));
                                     (yyval.argsptr)->singl=0;(yyval.argsptr)->left=(yyvsp[(1) - (3)].argptr),(yyval.argsptr)->right=(yyvsp[(3) - (3)].argsptr); ;}
     break;
@@ -1618,14 +1619,14 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 189 "calc.y"
+#line 190 "calc.y"
     {(yyval.argptr)=NULL;;}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 189 "calc.y"
+#line 190 "calc.y"
     {(yyval.argptr)=(struct ArgNode *) malloc(sizeof(struct ArgNode));
                        
                         sprintf((yyval.argptr)->argcode, "addi $a%d, $zero, %s($t8)",argcount,(yyvsp[(1) - (1)].tptr)->addr);argcount=(argcount+1)%4;if(argcount==0)argcount=1;
@@ -1635,56 +1636,56 @@ yyreduce:
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 198 "calc.y"
+#line 199 "calc.y"
     { sprintf((yyval.c),"%s",(yyvsp[(1) - (1)].nData));count=(count+1)%2;;}
     break;
 
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 199 "calc.y"
+#line 200 "calc.y"
     { sprintf((yyval.c),"%s\n%s\nadd $t0, $t0, $t1",(yyvsp[(1) - (3)].nData),(yyvsp[(3) - (3)].nData));;}
     break;
 
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 200 "calc.y"
+#line 201 "calc.y"
     { sprintf((yyval.c),"%s\n%s\nsub $t0, $t0, $t1",(yyvsp[(1) - (3)].nData),(yyvsp[(3) - (3)].nData));;}
     break;
 
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 201 "calc.y"
+#line 202 "calc.y"
     { sprintf((yyval.c),"%s\n%s\nmul $t0, $t0, $t1",(yyvsp[(1) - (3)].nData),(yyvsp[(3) - (3)].nData));;}
     break;
 
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 202 "calc.y"
+#line 203 "calc.y"
     { sprintf((yyval.c),"%s\n%s\ndiv $t0, $t0, $t1",(yyvsp[(1) - (3)].nData),(yyvsp[(3) - (3)].nData));;}
     break;
 
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 204 "calc.y"
+#line 205 "calc.y"
     {sprintf((yyval.nData),"li $t%d, %d",count,(yyvsp[(1) - (1)].val));count=(count+1)%2;;}
     break;
 
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 205 "calc.y"
+#line 206 "calc.y"
     {sprintf((yyval.nData), "lw $t%d, %s($t8)",count,(yyvsp[(1) - (1)].tptr)->addr);count=(count+1)%2;;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1688 "calc.tab.c"
+#line 1689 "calc.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1896,7 +1897,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 208 "calc.y"
+#line 209 "calc.y"
 
 
 void StmtsTrav(stmtsptr ptr){
@@ -1933,10 +1934,22 @@ void StmtTrav(stmtptr ptr){
       
    }
    else if (ptr->isWhile==1){
-      ws=whileStart; whileStart++;nj=nextJump;nextJump++;
+      if(ptr->isFor==1){
+
+         ws=whileStart; whileStart++;nj=nextJump;nextJump++;
+      fprintf(fp,"%s\nLabStartWhile%d:\n%s NextPart%d\n",ptr->initCode,ws,ptr->initJumpCode,nj);
+      StmtsTrav(ptr->down);
+      fprintf(fp,"j LabStartWhile%d\nNextPart%d:\n",ws,nj);
+
+      }
+      else{
+         ws=whileStart; whileStart++;nj=nextJump;nextJump++;
       fprintf(fp,"LabStartWhile%d:%s\n%s NextPart%d\n",ws,ptr->initCode,ptr->initJumpCode,nj);
       StmtsTrav(ptr->down);
       fprintf(fp,"j LabStartWhile%d\nNextPart%d:\n",ws,nj);
+
+      }
+      
    }
 	  
 }
@@ -1957,8 +1970,8 @@ int main ()
 
 void yyerror(char *s)
 {   
-    extern int yylineno;
-    fprintf(stderr,"\nAt line : %d %s  \n\n",yylineno,s);
+    
+    fprintf(stderr," %s  \n\n",s);
 }
 
 

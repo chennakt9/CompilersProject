@@ -5,7 +5,6 @@
 #include <string.h>
 
 int Adr=0;
-int yylineno=1;
 symrec *sym_table = (symrec *)0;
 %}
 
@@ -27,12 +26,12 @@ id [a-zA-Z_]+
 "procedure" {return PROCEDURE_KW;}
 "if"      {return IF_KW;}
 "then"    {return THEN_KW;}
-"for"     {printf("for\n");return FOR_KW;}
-"to"      {printf("to\n");return TO_KW;}
+"for"     {return FOR_KW;}
+"to"      {return TO_KW;}
 "<"   {yylval.val=2;return RELOP;}
 {number} {sscanf(yytext,"%d",&yylval.val);return NUM;}
-{id} {printf("id\n");symrec *s;s=getsym(yytext); if(s==0) s=putsym(yytext,ID);s->type = 0;s->retval = 101;yylval.tptr=s;return ID;}
-[\n]        {yylineno++;return yytext[0];}
+{id} {symrec *s;s=getsym(yytext); if(s==0) s=putsym(yytext,ID);s->type = 0;s->retval = 101;yylval.tptr=s;return ID;}
+[\n]        {return yytext[0];}
 .  {return yytext[0];}
 
 %%

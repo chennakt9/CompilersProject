@@ -132,9 +132,10 @@ stmt:
 
        | FOR_KW ID '=' ID TO_KW  ID DO_KW '\n' BEGIN_KW stmts END_KW   '\n'      {$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	                                                                     $$->isWhile=1;
-                                                                        $$->isFunc = 0; 
+                                                                        $$->isFunc = 0;
+                                                                        $$->isFor = 1; 
                                                                         sprintf($$->initCode,"lw $t0, %s($t8)\nlw $t1, %s($t8)\n", $4->addr,$6->addr);
-                                                                        sprintf($$->initJumpCode,"add $t0, 1, $t0\nbge $t0, $t1,");
+                                                                        sprintf($$->initJumpCode,"add $t0, $t0,1 \nbge $t0, $t1,");
                                                                         $$->down=$10;}
 
          | ID '=' exp ';' '\n'   {printf("Assignment statement\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
@@ -241,10 +242,22 @@ void StmtTrav(stmtptr ptr){
       
    }
    else if (ptr->isWhile==1){
-      ws=whileStart; whileStart++;nj=nextJump;nextJump++;
+      if(ptr->isFor==1){
+
+         ws=whileStart; whileStart++;nj=nextJump;nextJump++;
+      fprintf(fp,"%s\nLabStartWhile%d:\n%s NextPart%d\n",ptr->initCode,ws,ptr->initJumpCode,nj);
+      StmtsTrav(ptr->down);
+      fprintf(fp,"j LabStartWhile%d\nNextPart%d:\n",ws,nj);
+
+      }
+      else{
+         ws=whileStart; whileStart++;nj=nextJump;nextJump++;
       fprintf(fp,"LabStartWhile%d:%s\n%s NextPart%d\n",ws,ptr->initCode,ptr->initJumpCode,nj);
       StmtsTrav(ptr->down);
       fprintf(fp,"j LabStartWhile%d\nNextPart%d:\n",ws,nj);
+
+      }
+      
    }
 	  
 }
@@ -265,8 +278,8 @@ int main ()
 
 void yyerror(char *s)
 {   
-    extern int yylineno;
-    fprintf(stderr,"\nAt line : %d %s  \n\n",yylineno,s);
+    
+    fprintf(stderr," %s  \n\n",s);
 }
 
 

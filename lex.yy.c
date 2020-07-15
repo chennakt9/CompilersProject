@@ -406,9 +406,8 @@ char *yytext;
 #include <string.h>
 
 int Adr=0;
-int yylineno=1;
 symrec *sym_table = (symrec *)0;
-#line 412 "lex.yy.c"
+#line 411 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -559,9 +558,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 17 "tok.l"
+#line 16 "tok.l"
 
-#line 565 "lex.yy.c"
+#line 564 "lex.yy.c"
 
 	if ( yy_init )
 		{
@@ -646,105 +645,105 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 18 "tok.l"
+#line 17 "tok.l"
 {}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 19 "tok.l"
+#line 18 "tok.l"
 {return WHILE;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 20 "tok.l"
+#line 19 "tok.l"
 {return WRITELN;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 21 "tok.l"
+#line 20 "tok.l"
 {return PROGRAM;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 22 "tok.l"
+#line 21 "tok.l"
 {return INT;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 23 "tok.l"
+#line 22 "tok.l"
 {return VAR_KW;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 24 "tok.l"
+#line 23 "tok.l"
 {return BEGIN_KW;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 25 "tok.l"
+#line 24 "tok.l"
 {return END_KW;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 26 "tok.l"
+#line 25 "tok.l"
 {return DO_KW;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 27 "tok.l"
+#line 26 "tok.l"
 {return PROCEDURE_KW;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 28 "tok.l"
+#line 27 "tok.l"
 {return IF_KW;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 29 "tok.l"
+#line 28 "tok.l"
 {return THEN_KW;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 30 "tok.l"
-{printf("for\n");return FOR_KW;}
+#line 29 "tok.l"
+{return FOR_KW;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 31 "tok.l"
-{printf("to\n");return TO_KW;}
+#line 30 "tok.l"
+{return TO_KW;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 32 "tok.l"
+#line 31 "tok.l"
 {yylval.val=2;return RELOP;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 33 "tok.l"
+#line 32 "tok.l"
 {sscanf(yytext,"%d",&yylval.val);return NUM;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 34 "tok.l"
-{printf("id\n");symrec *s;s=getsym(yytext); if(s==0) s=putsym(yytext,ID);s->type = 0;s->retval = 101;yylval.tptr=s;return ID;}
+#line 33 "tok.l"
+{symrec *s;s=getsym(yytext); if(s==0) s=putsym(yytext,ID);s->type = 0;s->retval = 101;yylval.tptr=s;return ID;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 35 "tok.l"
-{yylineno++;return yytext[0];}
+#line 34 "tok.l"
+{return yytext[0];}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 36 "tok.l"
+#line 35 "tok.l"
 {return yytext[0];}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 38 "tok.l"
+#line 37 "tok.l"
 ECHO;
 	YY_BREAK
-#line 748 "lex.yy.c"
+#line 747 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1630,7 +1629,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 38 "tok.l"
+#line 37 "tok.l"
 
 
 /* The symbol table: a chain of `struct symrec'.  */
