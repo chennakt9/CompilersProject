@@ -75,25 +75,27 @@ struct ArgsNode *argsptr;
 
 %%
 
-prog: PROGRAM ID ';' '\n'stmts {printf("Start of the program");final=$5;}
+prog: PROGRAM ID ';' '\n'stmts     {printf("Start of the program");final=$5;
+                                    // Start of the program
+                                    }
 
-stmts: stmt {$$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
-   $$->singl=1;$$->left=$1,$$->right=NULL;}
-| stmt stmts {$$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
-   $$->singl=0;$$->left=$1,$$->right=$2;}
+stmts: stmt                         {$$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
+                               $$->singl=1;$$->left=$1,$$->right=NULL;}  // If there exists only single statement
+| stmt stmts                        {$$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
+                                $$->singl=0;$$->left=$1,$$->right=$2;}// If there are nore than single statements
      ;
 
 stmt:   
         '\n' {$$=NULL;}
 
-        | VAR_KW '\n' declr_stmts  '\n'                {$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+        | VAR_KW '\n' declr_stmts  '\n'                {$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));  // Assigning variables var a, b : integer
 	    $$->isWhile=0;
        $$->isFunc=0;
 
 	    sprintf($$->bodyCode,"\n");
 	    $$->down=$3;}
 
-         | BEGIN_KW '\n' stmts  END_KW  '\n'                {printf("Main Function\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         | BEGIN_KW '\n' stmts  END_KW  '\n'                {printf("Main Function\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));  // beginning of the body
 	    $$->isWhile=0;
        $$->isFunc=0;
 
@@ -101,7 +103,7 @@ stmt:
 	    $$->down=$3;}
        
 
-        | PROCEDURE_KW ID'(' args ')' '\n' BEGIN_KW  stmts END_KW '\n'          {printf("%s","Function Declaration\n");$$=NULL;
+        | PROCEDURE_KW ID'(' args ')' '\n' BEGIN_KW  stmts END_KW '\n'          {printf("%s","Function Declaration\n");$$=NULL;/* Function declaration w/ params*/
 
          struct StmtNode *temp;
          temp=(struct StmtNode *) malloc(sizeof(struct StmtNode));
@@ -112,9 +114,10 @@ stmt:
          funcfinal = (struct StmtsNode *) malloc(sizeof(struct StmtsNode));
          funcfinal->singl=1;funcfinal->left=temp,funcfinal->right=NULL;
 
-         }   /* Function declaration w/ params*/
+         }   
 
-        | IF_KW '(' ID RELOP ID ')' THEN_KW '\n' BEGIN_KW stmts  END_KW '\n'                     {printf("If Statement\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+        | IF_KW '(' ID RELOP ID ')' THEN_KW '\n' BEGIN_KW stmts  END_KW '\n'                     {// If statements
+                                                                                                printf("If Statement\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=0;
        $$->isFunc=0;
        $$->isIf=1;
@@ -123,14 +126,16 @@ stmt:
 	    sprintf($$->initJumpCode,"blt $t0, $t1,");
 	    $$->down=$10;}
 
-        | WHILE '(' ID RELOP ID ')' DO_KW  '\n' BEGIN_KW stmts END_KW '\n' {printf("%s","While Loop\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+        | WHILE '(' ID RELOP ID ')' DO_KW  '\n' BEGIN_KW stmts END_KW '\n' { // While statements
+
+      printf("%s","While Loop\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
 	    $$->isWhile=1;
        $$->isFunc=0;
 	    sprintf($$->initCode,"lw $t0, %s($t8)\nlw $t1, %s($t8)\n", $3->addr,$5->addr);
 	    sprintf($$->initJumpCode,"bge $t0, $t1,");
 	    $$->down=$10;}
 
-       | FOR_KW ID '=' ID TO_KW  ID DO_KW '\n' BEGIN_KW stmts END_KW   '\n'      {$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+       | FOR_KW ID '=' ID TO_KW  ID DO_KW '\n' BEGIN_KW stmts END_KW   '\n'      {$$=(struct StmtNode *) malloc(sizeof(struct StmtNode)); // Expression 
 	                                                                     $$->isWhile=1;
                                                                         $$->isFunc = 0;
                                                                         $$->isFor = 1; 
@@ -138,7 +143,7 @@ stmt:
                                                                         sprintf($$->initJumpCode,"add $t0, $t0,1 \nbge $t0, $t1,");
                                                                         $$->down=$10;}
 
-         | ID '=' exp ';' '\n'   {printf("Assignment statement\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         | ID '=' exp ';' '\n'   {printf("Assignment statement\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));  // assignment to variables
 	    $$->isWhile=0;
        $$->isFunc=0;
 
@@ -146,9 +151,8 @@ stmt:
 	    $$->down=NULL;}
 
          
-                                                                     // lw $t0,   <--4($t8)
-                                                                     // sw $t0,-->  8($t8)
-         | ID'('args')' ';' '\n' {printf("Function calling\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+                                                                     
+         | ID'('args')' ';' '\n' {printf("Function calling\n");$$=(struct StmtNode *) malloc(sizeof(struct StmtNode)); //Calling the functions
 	    $$->isWhile=0;
        $$->isFunc=0;
 	    sprintf($$->bodyCode,"jal FuncName%d\n", funcStart);
@@ -157,7 +161,7 @@ stmt:
 
 
          
-         | WRITELN'('ID')'	';' '\n'		{printf("Print Statemant\n"); $$=(struct StmtNode *) malloc(sizeof(struct StmtNode));
+         | WRITELN'('ID')'	';' '\n'		{printf("Print Statemant\n"); $$=(struct StmtNode *) malloc(sizeof(struct StmtNode));  //Write statements(print)
 	    $$->isWhile=0;
        $$->isFunc=0;
 	    sprintf($$->bodyCode,"\nli $v0, 1\nlw $a0, %s($t8)\nsyscall\naddi $a0, $0, 0xA\naddi $v0, $0, 0xB\nsyscall\n\n", $3->addr);
@@ -168,12 +172,12 @@ stmt:
 /* Invariant: we store the result of an expression in R0 */
 
 
-declr_stmts: ID ':' INT ';' '\n' {
+declr_stmts: ID ':' INT ';' '\n' {//Declaring only one statement
    
    $$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
    $$->singl=1;$$->left=NULL,$$->right=NULL;
    }
-            | ID ':' INT ';' '\n' declr_stmts  {
+            | ID ':' INT ';' '\n' declr_stmts  {//Declaring multiple assignments
                $$=(struct StmtsNode *) malloc(sizeof(struct StmtsNode));
    $$->singl=0;$$->left=NULL,$$->right=$6;
    }
@@ -233,6 +237,7 @@ void StmtTrav(stmtptr ptr){
          }
       }
       else if (ptr->isFunc==1){
+         // If there is a function
          int fs=funcStart; funcStart++;
          fprintf(fp,"FuncName%d:\n",fs);
          StmtsTrav(ptr->down);
@@ -242,6 +247,7 @@ void StmtTrav(stmtptr ptr){
       
    }
    else if (ptr->isWhile==1){
+      // If there is a while statement
       if(ptr->isFor==1){
 
          ws=whileStart; whileStart++;nj=nextJump;nextJump++;
